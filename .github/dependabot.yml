@@ -5,8 +5,14 @@ updates:
     schedule:
       interval: monthly
     groups:
+      # 小さな更新はまとめて1つのPRに。メジャー更新は個別のPRで確認する
       dev-dependencies:
         dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # typescript-eslint が TypeScript 6.1 以降に未対応のため、メジャー更新は手動で行う
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
