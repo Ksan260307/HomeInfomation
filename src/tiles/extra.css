@@ -1,0 +1,605 @@
+/* ---------------- 月間カレンダー ---------------- */
+.cal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+
+.cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: none;
+}
+
+.cal-title {
+  color: var(--text-3);
+  font-size: 0.85em;
+}
+
+.cal-title b {
+  color: var(--text-1);
+  font-size: 1.4em;
+  margin-left: 0.2em;
+}
+
+.cal-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.cal-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.cal-dow {
+  text-align: center;
+  font-size: 0.72em;
+  color: var(--text-3);
+  padding-bottom: 2px;
+}
+
+.cal-dow.is-sun,
+.cal-day.is-sun .cal-num {
+  color: var(--sun);
+}
+
+.cal-dow.is-sat,
+.cal-day.is-sat .cal-num {
+  color: var(--sat);
+}
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  padding-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cal-num {
+  font-size: calc(clamp(10px, min(4.6cqw, 6cqh), 22px) * var(--tile-scale, 1));
+  width: 1.9em;
+  height: 1.9em;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  flex: none;
+}
+
+.cal-day.is-today .cal-num {
+  background: var(--accent);
+  color: var(--accent-contrast) !important;
+  font-weight: 700;
+}
+
+.cal-day.is-out {
+  opacity: 0.3;
+}
+
+.cal-hol {
+  font-size: 0.58em;
+  color: var(--sun);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.cal-marks {
+  display: flex;
+  gap: 1px;
+  align-items: center;
+  font-size: 0.7em;
+  line-height: 1;
+  min-height: 0;
+}
+
+.cal-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-2);
+}
+
+/* ---------------- ゴミ出し ---------------- */
+.gb {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.gb-days {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.gb.is-wide .gb-days {
+  grid-template-columns: 1fr 1fr;
+}
+
+.gb-day {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+}
+
+.gb-day-label {
+  font-size: 0.76em;
+  color: var(--text-3);
+}
+
+.gb-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.35em 0.6em;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--gb) 22%, transparent);
+  border-left: 4px solid var(--gb);
+  min-width: 0;
+}
+
+.gb-icon {
+  font-size: 1.25em;
+}
+
+.gb-name {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gb-none {
+  color: var(--text-3);
+  font-size: 0.9em;
+  padding: 0.35em 0;
+}
+
+.gb-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border-top: 1px solid var(--line);
+  padding-top: 6px;
+  text-align: center;
+}
+
+.gb-week-day {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.gb-week-dow {
+  font-size: 0.72em;
+  color: var(--text-3);
+}
+
+.gb-week-dow.is-sun {
+  color: var(--sun);
+}
+
+.gb-week-dow.is-sat {
+  color: var(--sat);
+}
+
+.gb--mini {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gb-mini-icon {
+  font-size: 36cqmin;
+}
+
+.gb-mini-label {
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+/* ---------------- タイマー ---------------- */
+.timer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.timer-presets {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(30cqw, 72px), 1fr));
+  gap: 8px;
+  align-content: center;
+}
+
+.timer-preset {
+  all: unset;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 0.5em 0;
+  border-radius: var(--radius-md);
+  background: var(--chip-bg);
+  border: 1px solid var(--line);
+  font-size: calc(clamp(14px, 6cqmin, 26px) * var(--tile-scale, 1));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.timer-preset small {
+  font-size: 0.55em;
+  margin-left: 0.1em;
+  color: var(--text-3);
+}
+
+.timer-preset:active {
+  transform: scale(0.96);
+}
+
+.timer.is-active {
+  align-items: center;
+  justify-content: center;
+}
+
+.timer-ring {
+  position: relative;
+  width: min(84cqw, 70cqh);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.size-xs .timer-ring {
+  width: min(90cqw, 90cqh);
+}
+
+.timer-ring svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.timer-track {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 6;
+}
+
+.timer-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.25s linear;
+}
+
+.timer-left {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  font-size: calc(min(16cqw, 15cqh) * var(--tile-scale, 1));
+}
+
+.timer-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.timer--ringing {
+  all: unset;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  animation: ring-flash 1s infinite;
+}
+
+.timer-bell {
+  font-size: 30cqmin;
+  animation: shake 0.5s infinite;
+}
+
+.timer-done {
+  font-size: calc(clamp(16px, 9cqmin, 40px) * var(--tile-scale, 1));
+  font-weight: 800;
+}
+
+.timer-sub {
+  font-size: 0.8em;
+  color: var(--text-2);
+}
+
+@keyframes ring-flash {
+  50% {
+    background: color-mix(in srgb, var(--danger) 30%, transparent);
+  }
+}
+
+/* ---------------- 警報・注意報 ---------------- */
+.warn {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.warn-clear {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  color: var(--text-2);
+}
+
+.warn-clear span:first-child {
+  font-size: 2.2em;
+}
+
+.warn-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-content: flex-start;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.warn-chip {
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.92em;
+}
+
+.warn-chip.lv2 {
+  background: #f2e700;
+  color: #1d1b00;
+}
+
+.warn-chip.lv3 {
+  background: #ff2800;
+  color: #fff;
+}
+
+.warn-chip.lv4 {
+  background: #aa00aa;
+  color: #fff;
+}
+
+.warn-chip.lv5 {
+  background: #0c000c;
+  color: #fff;
+  outline: 2px solid #aa00aa;
+}
+
+.warn.is-lv3 {
+  box-shadow: inset 0 0 0 2px #ff2800;
+  border-radius: var(--radius-md);
+}
+
+.warn.is-lv4,
+.warn.is-lv5 {
+  box-shadow: inset 0 0 0 3px #aa00aa;
+  border-radius: var(--radius-md);
+}
+
+.warn-headline {
+  margin: 0;
+  font-size: 0.85em;
+  color: var(--text-2);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.warn-foot {
+  align-self: flex-start;
+  font-size: 0.75em;
+}
+
+.warn--mini {
+  all: unset;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.warn-mini-icon {
+  font-size: 34cqmin;
+}
+
+.warn-mini-text {
+  font-size: 0.78em;
+  font-weight: 700;
+}
+
+/* ---------------- 記念日 ---------------- */
+.anniv {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.anniv-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.15em;
+  min-height: 0;
+}
+
+.anniv-icon {
+  font-size: calc(min(20cqw, 20cqh) * var(--tile-scale, 1));
+  line-height: 1.1;
+}
+
+.anniv-name {
+  font-weight: 800;
+  font-size: calc(clamp(13px, 6cqmin, 26px) * var(--tile-scale, 1));
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.anniv-sub {
+  color: var(--text-3);
+  font-size: 0.82em;
+}
+
+.anniv-count {
+  color: var(--text-2);
+}
+
+.anniv-count b {
+  font-family: var(--font-display);
+  font-size: calc(clamp(22px, 13cqmin, 64px) * var(--tile-scale, 1));
+  font-weight: 300;
+  color: var(--accent);
+  margin: 0 0.12em;
+}
+
+.anniv-today {
+  font-size: calc(clamp(18px, 10cqmin, 48px) * var(--tile-scale, 1));
+  font-weight: 900;
+  color: var(--warn);
+  animation: bounce-in 0.8s var(--ease-out);
+}
+
+.anniv-main.is-today .anniv-icon {
+  animation: float 2s ease-in-out infinite;
+}
+
+.anniv-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.anniv-list li {
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+  padding: 0.35em 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.anniv-list-name {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.anniv-list-name small {
+  color: var(--text-3);
+}
+
+.anniv-list-days {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------- フォトフレーム ---------------- */
+.photo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.photo.fit-contain .photo-img {
+  object-fit: contain;
+}
+
+.photo-img.is-current {
+  z-index: 2;
+  animation: photo-in 1.2s var(--ease-out);
+}
+
+.photo-bg {
+  position: absolute;
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  object-fit: cover;
+  filter: blur(30px) brightness(0.6);
+  z-index: 0;
+}
+
+@keyframes photo-in {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  word-break: break-all;
+  color: var(--text-3);
+}

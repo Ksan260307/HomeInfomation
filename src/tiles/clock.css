@@ -1,0 +1,117 @@
+.clock {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqh;
+  text-align: center;
+}
+
+.clock-time {
+  font-family: var(--font-display);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+  font-size: calc(min(30cqw, 62cqh) * var(--tile-scale, 1));
+  display: flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.clock.has-seconds .clock-time {
+  font-size: calc(min(23cqw, 58cqh) * var(--tile-scale, 1));
+}
+
+.clock-colon {
+  opacity: 0.55;
+  margin: 0 0.02em;
+  transform: translateY(-0.06em);
+}
+
+.clock-sec {
+  font-size: 0.42em;
+  margin-left: 0.18em;
+  color: var(--text-3);
+}
+
+.clock-date {
+  font-size: calc(clamp(12px, min(7cqw, 14cqh), 34px) * var(--tile-scale, 1));
+  color: var(--text-2);
+  display: flex;
+  gap: 0.6em;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.clock-date.is-sun {
+  color: var(--sun);
+}
+
+.clock-date.is-sat {
+  color: var(--sat);
+}
+
+.clock-era {
+  color: var(--text-3);
+}
+
+/* アナログ時計 */
+.clock.is-analog .clock-time {
+  font-size: calc(min(12cqw, 10cqh) * var(--tile-scale, 1));
+  font-weight: 400;
+  color: var(--text-2);
+}
+
+.clock.is-analog .clock-date {
+  font-size: calc(clamp(11px, min(5cqw, 5cqh), 26px) * var(--tile-scale, 1));
+}
+
+.analog {
+  width: min(86cqw, 68cqh);
+  height: auto;
+  flex: none;
+}
+
+.analog-face {
+  fill: color-mix(in srgb, var(--text-1) 4%, transparent);
+  stroke: var(--line);
+  stroke-width: 1.5;
+}
+
+.analog-tick {
+  stroke: var(--text-3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+
+.analog-tick.major {
+  stroke: var(--text-1);
+  stroke-width: 3.5;
+}
+
+.analog-hour,
+.analog-minute {
+  stroke: var(--text-1);
+  stroke-linecap: round;
+}
+
+.analog-hour {
+  stroke-width: 7;
+}
+
+.analog-minute {
+  stroke-width: 4.5;
+}
+
+.analog-second {
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.analog-pin {
+  fill: var(--accent);
+}

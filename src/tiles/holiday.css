@@ -1,0 +1,110 @@
+.hol {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.hol-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3em;
+  text-align: center;
+  min-height: 0;
+}
+
+.hol-name {
+  font-size: calc(clamp(14px, 8cqmin, 30px) * var(--tile-scale, 1));
+  font-weight: 700;
+  color: var(--sun);
+}
+
+.hol-date {
+  color: var(--text-2);
+  font-size: 0.92em;
+}
+
+.hol-count {
+  display: flex;
+  align-items: baseline;
+  gap: 0.15em;
+}
+
+.hol-days {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: calc(clamp(34px, min(26cqw, 32cqh), 140px) * var(--tile-scale, 1));
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(180deg, var(--text-1) 35%, var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.hol-pre {
+  color: var(--text-3);
+  font-size: 1.05em;
+}
+
+.hol--xs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.hol--xs .hol-days {
+  font-size: 42cqmin;
+}
+
+.hol--xs .hol-days small {
+  font-size: 0.35em;
+}
+
+.hol-label {
+  font-size: 0.8em;
+  color: var(--sun);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.hol-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.hol-list li {
+  display: flex;
+  gap: 0.8em;
+  padding: 0.35em 0.2em;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.9em;
+}
+
+.hol-list-date {
+  color: var(--text-2);
+  min-width: 5.6em;
+  font-variant-numeric: tabular-nums;
+}
+
+.hol-list-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hol-list-days {
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}

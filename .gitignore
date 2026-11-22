@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+*.log
+.DS_Store
+Thumbs.db
+
+# PC ローカルに保存する設定・データ（APIやWebサイトの設定、WiFi情報、伝言板など）
+# Git には絶対にコミットしない
+data/
+.env
+.env.*
+!.env.example
+
+# リリース用の一時フォルダ
+release/

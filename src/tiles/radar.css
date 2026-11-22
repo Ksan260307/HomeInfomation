@@ -1,0 +1,56 @@
+.radar {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.radar-map {
+  position: absolute;
+  inset: 0;
+  background: #dfe6ee;
+  pointer-events: none;
+}
+
+[data-scheme='dark'] .radar-map .leaflet-tile-pane > .leaflet-layer:first-child {
+  filter: invert(0.92) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+
+.radar-badge {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 500;
+  padding: 0.3em 0.75em;
+  border-radius: 999px;
+  background: rgba(10, 14, 28, 0.72);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.radar-fc {
+  background: var(--warn);
+  color: #201400;
+  border-radius: 999px;
+  padding: 0 0.5em;
+  font-size: 0.8em;
+}
+
+.radar-attr {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  z-index: 500;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.45);
+  padding: 1px 6px;
+  border-radius: 6px;
+}

@@ -1,0 +1,49 @@
+name: Deploy to home PC
+
+# main の CI が成功したら、自宅 PC（GitHub Actions のセルフホストランナー）へ自動デプロイする。
+# 有効にするには README の「自宅 PC への自動デプロイ」の手順でランナーを登録し、
+# リポジトリ変数 HOME_PC_DEPLOY を true に設定する（未設定ならこのジョブは実行されない）。
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-home-pc
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: >-
+      vars.HOME_PC_DEPLOY == 'true' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: [self-hosted, Windows]
+    env:
+      # ジョブ終了時にランナーがサーバープロセスを止めないようにする
+      RUNNER_TRACKING_ID: ''
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Deploy and restart
+        shell: pwsh
+        run: >-
+          ./scripts/deploy-local.ps1
+          -Source "${{ github.workspace }}"
+          -Target "${{ vars.HOME_INFO_INSTALL_DIR || 'C:\HomeInformation\app' }}"
+          -DataDir "${{ vars.HOME_INFO_DATA_DIR }}"
+          -Port "${{ vars.HOME_INFO_PORT || '8580' }}"

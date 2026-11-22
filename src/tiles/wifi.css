@@ -1,0 +1,88 @@
+.wifi {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.wifi-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.wifi.is-wide .wifi-content {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 5cqw;
+}
+
+.wifi-qr {
+  aspect-ratio: 1;
+  height: min(100%, 78cqw);
+  max-height: 100%;
+  min-height: 0;
+  flex: 0 1 auto;
+  background: #fff;
+  border-radius: var(--radius-md);
+  padding: 4%;
+  box-shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.5);
+}
+
+.wifi:not(.is-wide) .wifi-qr {
+  height: auto;
+  width: min(78cqw, 62cqh);
+}
+
+.size-xs .wifi-qr,
+.size-s .wifi:not(.is-wide) .wifi-qr {
+  width: min(88cqw, 88cqh);
+}
+
+.wifi-qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.wifi-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4em;
+  align-items: center;
+  min-width: 0;
+}
+
+.wifi.is-wide .wifi-info {
+  align-items: flex-start;
+}
+
+.wifi-ssid {
+  font-size: calc(clamp(15px, 6cqmin, 28px) * var(--tile-scale, 1));
+  font-weight: 700;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wifi-pass {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--text-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  cursor: pointer;
+  padding: 0.25em 0.6em;
+  border-radius: 999px;
+  background: var(--chip-bg);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

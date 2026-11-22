@@ -1,0 +1,173 @@
+.wx {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: min(3cqh, 14px);
+  min-height: 0;
+}
+
+.wx--xs {
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+}
+
+.wx--xs .wx-icon {
+  font-size: 34cqmin;
+  line-height: 1;
+}
+
+.wx--xs .wx-temp {
+  font-size: 30cqmin;
+  font-weight: 300;
+}
+
+.wx-main {
+  display: flex;
+  align-items: center;
+  gap: 4cqw;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.wx.is-wide .wx-main {
+  flex: 0 0 auto;
+}
+
+.wx-now {
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+  font-size: calc(clamp(28px, min(18cqw, 24cqh), 96px) * var(--tile-scale, 1));
+  line-height: 1;
+}
+
+.wx-icon {
+  font-size: 0.9em;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
+}
+
+.wx-temp {
+  font-family: var(--font-display);
+  font-weight: 250;
+  letter-spacing: -0.03em;
+}
+
+.wx-temp small {
+  font-size: 0.35em;
+  color: var(--text-3);
+  margin-left: 0.1em;
+  vertical-align: top;
+}
+
+.wx-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35em 0.9em;
+  color: var(--text-2);
+  font-size: 0.95em;
+  min-width: 0;
+}
+
+.wx--s .wx-meta {
+  font-size: 0.85em;
+}
+
+.t-hi {
+  color: var(--sun);
+  font-weight: 600;
+}
+
+.t-lo {
+  color: var(--sat);
+  font-weight: 600;
+}
+
+.wx-hourly {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 0.6em 0.2em;
+  border-top: 1px solid var(--line);
+}
+
+.wx-hour {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  flex: 1 1 0;
+  min-width: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.wx-hour-time {
+  font-size: 0.78em;
+  color: var(--text-3);
+}
+
+.wx-hour-icon {
+  font-size: 1.35em;
+}
+
+.wx-hour-temp {
+  font-weight: 600;
+}
+
+.wx-hour-pop {
+  font-size: 0.75em;
+  color: var(--info);
+}
+
+.wx-daily {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--line);
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wx-day {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.35em 0.2em;
+  border-bottom: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+
+.wx-day:last-child {
+  border-bottom: 0;
+}
+
+.wx-day-name {
+  color: var(--text-2);
+}
+
+.wx-day-name.is-sun {
+  color: var(--sun);
+}
+
+.wx-day-name.is-sat {
+  color: var(--sat);
+}
+
+.wx-day-icon {
+  font-size: 1.3em;
+}
+
+.wx-day-pop {
+  font-size: 0.85em;
+  color: var(--info);
+  min-width: 3.6em;
+  text-align: right;
+}
+
+.wx-day-temp {
+  display: flex;
+  gap: 0.6em;
+  min-width: 5em;
+  justify-content: flex-end;
+}
