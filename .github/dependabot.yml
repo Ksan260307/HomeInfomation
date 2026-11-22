@@ -5,13 +5,34 @@ updates:
     schedule:
       interval: monthly
     groups:
-      # 小さな更新はまとめて1つのPRに。メジャー更新は個別のPRで確認する
+      # 小さな更新はまとめて1つのPRにする
       dev-dependencies:
         dependency-type: development
         update-types: [minor, patch]
     ignore:
-      # typescript-eslint が TypeScript 6.1 以降に未対応のため、メジャー更新は手動で行う
+      # 以下は互いにバージョンをそろえる必要があるツール群。
+      # 1つだけメジャー更新すると npm ci が失敗するため、メジャー更新は手動でまとめて行う。
+      # - Vite 系: vite / @vitejs/plugin-react / vitest
+      # - ESLint 系: eslint / @eslint/js / typescript-eslint / eslint-plugin-react-hooks
+      # - TypeScript: typescript-eslint が TypeScript 6.1 以降に未対応
+      # - @types/node: 実行環境の Node.js（22）に合わせる
+      - dependency-name: vite
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@vitejs/plugin-react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: vitest
+        update-types: ['version-update:semver-major']
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@eslint/js'
+        update-types: ['version-update:semver-major']
+      - dependency-name: typescript-eslint
+        update-types: ['version-update:semver-major']
+      - dependency-name: eslint-plugin-react-hooks
+        update-types: ['version-update:semver-major']
       - dependency-name: typescript
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
         update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
