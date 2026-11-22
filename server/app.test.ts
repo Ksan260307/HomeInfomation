@@ -73,6 +73,14 @@ describe('shared boards', () => {
     expect(b.memos).toHaveLength(0);
   });
 
+  it('prunes daily check lists older than 7 days', async () => {
+    await call('POST', '/lists/codmon-20200101/items', { text: '連絡帳を提出' });
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const b = await call<BoardsState>('POST', `/lists/codmon-${today}/items`, { text: '検温' });
+    expect(b.lists['codmon-20200101']).toBeUndefined();
+    expect(b.lists[`codmon-${today}`][0].text).toBe('検温');
+  });
+
   it('rejects empty text and bad list ids', async () => {
     await expect(call('POST', '/lists/tasks/items', { text: '  ' })).rejects.toThrow('400');
     await expect(call('POST', '/lists/bad%20id/items', { text: 'x' })).rejects.toThrow('400');

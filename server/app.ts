@@ -182,6 +182,15 @@ export function createApp(opts: AppOptions) {
   api.post('/lists/:listId/items', async (req, res) => {
     const id = listId(req);
     const b = await boardsStore.update((cur) => {
+      // 日付ごとのチェックリスト（コドモンタイル用）は7日より古いものを削除する
+      const daily = id.match(/^(.+)-(\d{8})$/);
+      if (daily) {
+        const limit = new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 10).replace(/-/g, '');
+        for (const key of Object.keys(cur.lists)) {
+          const m = key.match(/^(.+)-(\d{8})$/);
+          if (m && m[1] === daily[1] && m[2] < limit) delete cur.lists[key];
+        }
+      }
       const items = (cur.lists[id] ??= []);
       const item: ListItem = { id: newId('i'), text: text(req.body?.text, 500), done: false, createdAt: Date.now() };
       if (req.body?.important === true) item.important = true;

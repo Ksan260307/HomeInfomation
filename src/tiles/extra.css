@@ -91,6 +91,7 @@
 }
 
 .cal-hol {
+  flex: none;
   font-size: 0.58em;
   color: var(--sun);
   white-space: nowrap;
@@ -100,6 +101,7 @@
 }
 
 .cal-marks {
+  flex: none;
   display: flex;
   gap: 1px;
   align-items: center;

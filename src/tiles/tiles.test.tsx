@@ -93,6 +93,27 @@ describe('tiles render at every size', () => {
   }
 });
 
+describe('weather weekly view', () => {
+  it('renders 7-day forecast in rows or columns depending on size', async () => {
+    const def = TILE_DEFINITIONS.find((d) => d.type === 'weather')!;
+    const Comp = def.component;
+    for (const [w, h, cols, rows] of SIZES) {
+      const { container, unmount } = render(
+        <TileSizeContext.Provider value={makeSizeInfo(w, h, cols, rows)}>
+          <Comp tile={{ id: 'wx', type: 'weather', x: 0, y: 0, w: cols, h: rows }} props={{ view: 'weekly' }} />
+        </TileSizeContext.Provider>,
+      );
+      await act(async () => {
+        await new Promise((r) => setTimeout(r, 0));
+      });
+      const days = container.querySelectorAll('.wx-wd');
+      expect(days.length).toBeGreaterThanOrEqual(2);
+      expect(days.length).toBeLessThanOrEqual(7);
+      unmount();
+    }
+  });
+});
+
 describe('quiz data', () => {
   it('has 100 valid trivia questions', () => {
     expect(TRIVIA).toHaveLength(100);

@@ -171,3 +171,110 @@
   min-width: 5em;
   justify-content: flex-end;
 }
+
+/* ---------------- 週間予報 ---------------- */
+.wx-week-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  gap: 4px;
+}
+
+.wx-week.is-rows .wx-week-list {
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.wx-week.is-columns .wx-week-list {
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.wx-wd {
+  font-variant-numeric: tabular-nums;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+}
+
+.wx-wd.is-today {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.wx-week.is-rows .wx-wd {
+  display: grid;
+  grid-template-columns: 5.2em 1.8em 1fr auto auto;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.25em 0.5em;
+}
+
+.wx-week.is-rows.is-compact .wx-wd {
+  grid-template-columns: 1fr auto auto;
+}
+
+.wx-week.is-columns .wx-wd {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 0.2em;
+  padding: 0.4em 0.1em;
+}
+
+.wx-wd-name {
+  white-space: nowrap;
+  color: var(--text-2);
+}
+
+.wx-wd-name small {
+  font-size: 0.78em;
+}
+
+.wx-week.is-columns .wx-wd-name small {
+  display: block;
+  text-align: center;
+}
+
+.wx-wd-name.is-sun {
+  color: var(--sun);
+}
+
+.wx-wd-name.is-sat {
+  color: var(--sat);
+}
+
+.wx-wd-icon {
+  font-size: 1.4em;
+  line-height: 1.1;
+}
+
+.wx-week.is-columns .wx-wd-icon {
+  font-size: calc(clamp(18px, min(8cqw, 18cqh), 44px) * var(--tile-scale, 1));
+}
+
+.wx-wd-label {
+  color: var(--text-3);
+  font-size: 0.85em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wx-wd-temp {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+}
+
+.wx-week.is-columns .wx-wd-temp {
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.wx-wd-pop {
+  font-size: 0.8em;
+  color: var(--info);
+  white-space: nowrap;
+}
