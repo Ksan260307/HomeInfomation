@@ -148,19 +148,8 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     defaultSize: { w: 3, h: 2 },
     minSize: { w: 1, h: 1 },
     component: FunFactTile,
-    defaultProps: { interval: 30, reveal: 'tap' },
-    options: [
-      { key: 'interval', label: '自動で切り替える間隔（分）', type: 'number', min: 1, max: 1440 },
-      {
-        key: 'reveal',
-        label: '答えの表示',
-        type: 'select',
-        options: [
-          { value: 'tap', label: 'タップで表示' },
-          { value: 'always', label: '最初から表示' },
-        ],
-      },
-    ],
+    defaultProps: { interval: 30 },
+    options: [{ key: 'interval', label: '自動で切り替える間隔（分）', type: 'number', min: 1, max: 1440, help: 'タイルをタップしても次のトリビアに進めます' }],
   },
   {
     type: 'kidsQuiz',
