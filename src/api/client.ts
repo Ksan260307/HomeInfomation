@@ -46,6 +46,8 @@ export const api = {
   deleteItem: (list: string, id: string) => request<BoardsState>('DELETE', `/lists/${list}/items/${id}`),
   clearDone: (list: string) => request<BoardsState>('POST', `/lists/${list}/clear-done`),
 
+  setLock: (enabled: boolean) => request<{ enabled: boolean }>('PUT', '/lock', { enabled }),
+
   exportUrl: (secrets: boolean) => `/api/export${secrets ? '?secrets=1' : ''}`,
   importBundle: (bundle: ExportBundle, sections: string[]) => request<{ ok: boolean; imported: string[] }>('POST', '/import', { bundle, sections }),
 };

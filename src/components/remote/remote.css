@@ -284,3 +284,50 @@
 .rc-tabs button.is-active span {
   filter: none;
 }
+
+.rc-lock {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--tile-bg);
+  border: 2px solid var(--tile-border);
+  cursor: pointer;
+}
+
+.rc-lock.is-locked {
+  border-color: var(--warn);
+  background: color-mix(in srgb, var(--warn) 14%, var(--tile-bg));
+}
+
+.rc-lock:disabled {
+  opacity: 0.6;
+}
+
+.rc-lock-icon {
+  font-size: 1.8em;
+}
+
+.rc-lock-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rc-lock-text small {
+  color: var(--text-3);
+}
+
+.rc-lock .toggle-track.is-on {
+  background: var(--warn);
+}
+
+.rc-lock .toggle-track.is-on .toggle-thumb {
+  transform: translateX(18px);
+}

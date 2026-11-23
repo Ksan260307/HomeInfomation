@@ -78,6 +78,9 @@ export const DEFAULT_SETTINGS: AppSettings = {
   anniversaries: {
     items: [{ id: 'xmas', name: 'クリスマス', date: '0000-12-25', kind: 'event', icon: '🎄' }],
   },
+  lock: {
+    enabled: false,
+  },
   photos: {
     dir: '',
     intervalSec: 15,

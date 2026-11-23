@@ -149,6 +149,18 @@ describe('remote control', () => {
     ctrl.abort();
   });
 
+  it('locks the main screen only through the lock API', async () => {
+    await call('PUT', '/lock', { enabled: true });
+    let s = await call<PublicSettings>('GET', '/settings');
+    expect(s.lock.enabled).toBe(true);
+    // 設定画面からの保存ではロック状態は変わらない
+    s.lock.enabled = false;
+    s = await call<PublicSettings>('PUT', '/settings', s);
+    expect(s.lock.enabled).toBe(true);
+    await call('PUT', '/lock', { enabled: false });
+    expect((await call<PublicSettings>('GET', '/settings')).lock.enabled).toBe(false);
+  });
+
   it('rejects unknown commands', async () => {
     await expect(call('POST', '/remote/command', { target: 'all', command: { type: 'format-disk' } })).rejects.toThrow('400');
   });

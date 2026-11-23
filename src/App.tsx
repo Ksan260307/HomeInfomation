@@ -83,6 +83,7 @@ export default function App() {
   const wakeUntil = useApp((s) => s.wakeUntil);
   const setRemoteDim = useApp((s) => s.setRemoteDim);
   const [remote] = useState(isRemoteMode);
+  const locked = useApp((s) => s.settings.lock?.enabled === true);
 
   useEffect(() => {
     void init();
@@ -146,10 +147,10 @@ export default function App() {
   return (
     <div className="app" onPointerDown={dimmed ? () => setRemoteDim(false, 60_000) : undefined}>
       <DisplayRemoteBridge dimmed={dimmed} />
-      <HomeScreen onOpenSettings={() => setSettingsOpen(true)} />
+      <HomeScreen onOpenSettings={() => !locked && setSettingsOpen(true)} locked={locked} />
       {!serverOnline && <div className="offline-badge">PC のサーバーに接続できません（オフライン表示中）</div>}
       {dimmed && <div className={`night-dim ${remoteDim ? 'is-deep' : ''}`} />}
-      {settingsOpen && (
+      {settingsOpen && !locked && (
         <Suspense fallback={null}>
           <SettingsSheet onClose={() => setSettingsOpen(false)} />
         </Suspense>

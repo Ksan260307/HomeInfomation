@@ -9,7 +9,7 @@ import { Icon } from './icons';
 import { TileOptionsDialog } from './TileOptionsDialog';
 import { TilePicker } from './TilePicker';
 
-export function HomeScreen({ onOpenSettings }: { onOpenSettings(): void }) {
+export function HomeScreen({ onOpenSettings, locked = false }: { onOpenSettings(): void; locked?: boolean }) {
   const { profile } = useActiveProfile();
   const pageIndex = useApp((s) => s.pageIndex);
   const setPageIndex = useApp((s) => s.setPageIndex);
@@ -172,7 +172,15 @@ export function HomeScreen({ onOpenSettings }: { onOpenSettings(): void }) {
         ))}
       </nav>
 
-      {!editMode && (
+      {!editMode && locked && (
+        <div className="corner-actions is-locked" title="リモコンでロックされています">
+          <span className="lock-badge" aria-label="ロック中">
+            🔒
+          </span>
+        </div>
+      )}
+
+      {!editMode && !locked && (
         <div className="corner-actions">
           <button type="button" className="icon-btn glass" aria-label="ホーム画面を編集" onClick={() => setEditMode(true)}>
             <Icon name="grid" size={18} />

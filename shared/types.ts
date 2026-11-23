@@ -135,6 +135,10 @@ export interface AppSettings {
   anniversaries: {
     items: Anniversary[];
   };
+  /** メイン画面のロック（リモコンから切り替え。編集・設定を禁止する） */
+  lock: {
+    enabled: boolean;
+  };
   photos: {
     /** 写真フォルダのパス（空なら data/photos） */
     dir: string;
@@ -283,4 +287,5 @@ export type RemoteCommand =
   | { type: 'reload' }
   | { type: 'dim' }
   | { type: 'undim' }
-  | { type: 'identify' };
+  | { type: 'identify' }
+  | { type: 'sync' };

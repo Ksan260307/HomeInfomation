@@ -139,12 +139,12 @@ describe('quiz data', () => {
     }
   });
 
-  it('has 400 fun facts with answers', () => {
+  it('has 400 fun facts written as statements (not questions)', () => {
     expect(FUN_FACTS).toHaveLength(400);
-    expect(new Set(FUN_FACTS.map((f) => f.q)).size).toBe(400);
+    expect(new Set(FUN_FACTS.map((f) => f.text)).size).toBe(400);
     for (const f of FUN_FACTS) {
-      expect(f.q.length).toBeGreaterThan(3);
-      expect(f.a.length).toBeGreaterThan(10);
+      expect(f.text.length).toBeGreaterThan(15);
+      expect(f.text).not.toMatch(/[？?]$/);
     }
   });
 });

@@ -124,7 +124,7 @@ export const useApp = create<AppState>((set, get) => ({
       const local = get().layout;
       // 編集中・未保存の変更があるときはサーバー側で上書きしない
       const useServer = !get().dirty && !get().editMode && layout.updatedAt >= local.updatedAt;
-      set({ settings, serverOnline: true, ...(useServer ? { layout } : {}) });
+      set({ settings, serverOnline: true, ...(useServer ? { layout } : {}), ...(settings.lock?.enabled ? { editMode: false } : {}) });
       if (useServer) writeLocal(LS_LAYOUT, layout);
       // サーバーにまだレイアウトが無ければ、現在の（既定）レイアウトを保存しておく
       if (layout.updatedAt === 0 && !layout.profiles['tablet-landscape']) {
@@ -145,6 +145,8 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   setEditMode(on) {
+    // ロック中は編集モードに入れない
+    if (on && get().settings.lock?.enabled) return;
     set({ editMode: on });
   },
 
@@ -176,7 +178,7 @@ export const useApp = create<AppState>((set, get) => ({
   async saveSettings(next) {
     const saved = await api.putSettings(next);
     writeLocal(LS_SETTINGS, saved);
-    set({ settings: saved });
+    set({ settings: saved, ...(saved.lock?.enabled ? { editMode: false } : {}) });
     invalidateRemote();
   },
 

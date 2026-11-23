@@ -118,6 +118,8 @@ export function createApp(opts: AppOptions) {
         next.calendar.timetreePassword = pwSet === false ? '' : current.calendar.timetreePassword;
       }
       delete (next.calendar as Partial<PublicSettings['calendar']>).timetreePasswordSet;
+      // ロック状態は専用API（/api/lock）でのみ変更する（設定画面の保存で上書きされないように）
+      next.lock = current.lock;
       return next;
     });
     cache.clear();
@@ -433,7 +435,7 @@ export function createApp(opts: AppOptions) {
   });
 
   // ------------------------------------------------------------------ リモコン（スマホから表示端末を操作）
-  const COMMANDS = new Set(['goto', 'next', 'prev', 'reload', 'dim', 'undim', 'identify']);
+  const COMMANDS = new Set(['goto', 'next', 'prev', 'reload', 'dim', 'undim', 'identify', 'sync']);
 
   api.get('/remote/stream', (req, res) => {
     const id = req.query.id;
@@ -448,6 +450,14 @@ export function createApp(opts: AppOptions) {
     const body = req.body as Record<string, unknown>;
     if (!RemoteHub.validId(body?.id)) throw new HttpError(400, '端末IDが不正です');
     res.json(remote.heartbeat({ ...body, id: body.id }));
+  });
+
+  // メイン画面のロック（リモコンから切り替え）。変更したら全端末にすぐ反映させる
+  api.put('/lock', async (req, res) => {
+    const enabled = req.body?.enabled === true;
+    const saved = await settingsStore.update((cur) => ({ ...cur, lock: { enabled } }));
+    remote.send('all', { type: 'sync' });
+    res.json({ enabled: saved.lock.enabled });
   });
 
   api.get('/remote/displays', (_req, res) => {

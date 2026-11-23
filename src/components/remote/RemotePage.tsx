@@ -49,6 +49,40 @@ function TilePreview({ type, props, height }: { type: string; props?: Record<str
   );
 }
 
+/** メイン画面（全ての表示端末）のロック切り替え */
+function LockCard() {
+  const locked = useApp((s) => s.settings.lock?.enabled === true);
+  const sync = useApp((s) => s.syncFromServer);
+  const toast = useApp((s) => s.toast);
+  const [busy, setBusy] = useState(false);
+  const toggle = async () => {
+    setBusy(true);
+    try {
+      await api.setLock(!locked);
+      await sync();
+      toast(!locked ? '🔒 メイン画面をロックしました' : '🔓 ロックを解除しました');
+    } catch (e) {
+      toast(`切り替えられませんでした: ${(e as Error).message}`, 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="rc-section">
+      <button type="button" className={`rc-lock ${locked ? 'is-locked' : ''}`} onClick={() => void toggle()} disabled={busy}>
+        <span className="rc-lock-icon">{locked ? '🔒' : '🔓'}</span>
+        <span className="rc-lock-text">
+          <b>{locked ? 'メイン画面はロック中' : 'メイン画面のロック：オフ'}</b>
+          <small>{locked ? '編集・設定はできません。タップで解除' : 'タップすると、編集や設定ができないようにします'}</small>
+        </span>
+        <span className={`toggle-track ${locked ? 'is-on' : ''}`}>
+          <span className="toggle-thumb" />
+        </span>
+      </button>
+    </section>
+  );
+}
+
 function ScreenTab() {
   const { data, reload } = useRemote<{ displays: DisplayInfo[] }>('/remote/displays', 4_000);
   const toast = useApp((s) => s.toast);
@@ -78,15 +112,19 @@ function ScreenTab() {
   if (!data) return <p className="rc-empty">読み込み中…</p>;
   if (!displays.length) {
     return (
+      <>
+      <LockCard />
       <div className="rc-empty">
         <p>📺 表示中の端末が見つかりません</p>
         <p className="rc-sub">iPad などで Home Information を開くと、ここに表示されます。</p>
       </div>
+      </>
     );
   }
 
   return (
     <>
+      <LockCard />
       <section className="rc-section">
         <h2>操作する端末</h2>
         <div className="rc-chips">

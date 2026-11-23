@@ -8,7 +8,7 @@ import './funfact.css';
 
 /**
  * トリビア（へぇ〜となる雑学・言葉の由来）。
- * クイズ形式ではなく、見出しと解説を最初から並べて「読む」豆知識カードとして表示する。
+ * クイズ形式や「〜は？」という問いかけではなく、言い切りの文章で「読む」豆知識カードとして表示する。
  * 一定時間ごとに自動で切り替わり、タップまたは「次へ」で好きなだけ読み進められる。
  */
 export function FunFactTile({ props }: TileComponentProps) {
@@ -23,12 +23,11 @@ export function FunFactTile({ props }: TileComponentProps) {
   const fact = FUN_FACTS[index];
   const next = () => setSkip({ period, step: step + 1 });
 
-  // 小さいタイル：解説だけを表示し、タップで次へ
+  // 小さいタイル：文章だけを表示し、タップで次へ
   if (!atLeast(size.size, 's') || size.height < 150) {
     return (
       <button type="button" className="ff ff--mini" onClick={next} key={fact.id}>
-        <span className="ff-title">{fact.q}</span>
-        <span className="ff-text">{fact.a}</span>
+        <span className="ff-text">{fact.text}</span>
       </button>
     );
   }
@@ -37,8 +36,7 @@ export function FunFactTile({ props }: TileComponentProps) {
     <div className="ff">
       <TileHeader icon="🤔" title="トリビア" sub={fact.category} right={<span className="ff-count">No.{fact.id}</span>} />
       <article className="ff-body" key={fact.id} onClick={next}>
-        <h3 className="ff-title ff-title--big">{fact.q}</h3>
-        <p className="ff-text ff-text--big">{fact.a}</p>
+        <p className="ff-text ff-text--big">{fact.text}</p>
       </article>
       <div className="ff-actions">
         <button type="button" className="ff-next" onClick={next}>

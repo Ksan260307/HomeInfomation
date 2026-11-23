@@ -42,6 +42,9 @@ export function useDisplayRemote(isDimmed: boolean) {
         case 'undim':
           s.setRemoteDim(false, 30 * 60_000);
           break;
+        case 'sync':
+          void s.syncFromServer();
+          break;
         case 'identify':
           s.setRemoteDim(false, 60_000);
           s.toast(`📱 リモコンから呼び出し中：${getDeviceName()}`);

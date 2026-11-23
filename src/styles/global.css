@@ -645,6 +645,16 @@ img {
   opacity: 1;
 }
 
+.corner-actions.is-locked {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.lock-badge {
+  font-size: 14px;
+  padding: 6px 8px;
+}
+
 .corner-actions .icon-btn {
   width: 34px;
   height: 34px;
