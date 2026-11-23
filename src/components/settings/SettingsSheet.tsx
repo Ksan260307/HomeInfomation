@@ -1,7 +1,7 @@
 import QRCode from 'qrcode';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { newId } from '../../../shared/defaults';
-import type { Anniversary, ExportBundle, FeedSource, FlyerStore, GarbageRule, PublicSettings } from '../../../shared/types';
+import type { Anniversary, ExportBundle, FeedSource, FlyerStore, GarbageRule, PublicSettings, Shortcut } from '../../../shared/types';
 import { api } from '../../api/client';
 import { GRID_PRESETS, repairProfile } from '../../grid/layout';
 import { useRemote } from '../../hooks/useRemote';
@@ -14,7 +14,7 @@ import { Icon } from '../icons';
 import { Button, Field, Segmented, Sheet, Toggle } from '../ui';
 import './settings.css';
 
-type SectionId = 'display' | 'region' | 'wifi' | 'tigers' | 'news' | 'flyers' | 'calendar' | 'garbage' | 'anniv' | 'photos' | 'data' | 'about';
+type SectionId = 'display' | 'region' | 'wifi' | 'tigers' | 'news' | 'flyers' | 'calendar' | 'garbage' | 'anniv' | 'shortcuts' | 'photos' | 'data' | 'about';
 
 const SECTIONS: { id: SectionId; icon: string; label: string }[] = [
   { id: 'display', icon: '🎨', label: '表示・レイアウト' },
@@ -26,6 +26,7 @@ const SECTIONS: { id: SectionId; icon: string; label: string }[] = [
   { id: 'calendar', icon: '📅', label: '予定（TimeTree）' },
   { id: 'garbage', icon: '🗑️', label: 'ゴミ出し' },
   { id: 'anniv', icon: '🎂', label: '記念日' },
+  { id: 'shortcuts', icon: '🔗', label: 'ショートカット' },
   { id: 'photos', icon: '🖼️', label: '写真' },
   { id: 'data', icon: '💾', label: 'データ管理' },
   { id: 'about', icon: 'ℹ️', label: '使い方・情報源' },
@@ -658,6 +659,55 @@ function AnnivSection({ d, update }: { d: Draft; update: Update }) {
 }
 
 // ---------------------------------------------------------------------------
+// ショートカット
+// ---------------------------------------------------------------------------
+
+function ShortcutsSection({ d, update }: { d: Draft; update: Update }) {
+  const items = d.shortcuts.items;
+  const set = (i: number, patch: Partial<Shortcut>) => update((x) => void (x.shortcuts.items = x.shortcuts.items.map((s, j) => (j === i ? { ...s, ...patch } : s))));
+  const move = (i: number, dir: -1 | 1) =>
+    update((x) => {
+      const list = [...x.shortcuts.items];
+      const j = i + dir;
+      if (j < 0 || j >= list.length) return;
+      [list[i], list[j]] = [list[j], list[i]];
+      x.shortcuts.items = list;
+    });
+  return (
+    <Section
+      title="ショートカット"
+      desc={
+        <>
+          ショートカットタイルに並べるボタンです。https:// で始まるURLのほか、アプリ独自のURL（例: youtube://）も登録できます。
+          <br />
+          iPad では、アプリがインストールされていれば https:// のリンクからアプリが開くこともあります（アプリによって異なります）。
+        </>
+      }
+    >
+      <div className="row-editor">
+        {items.map((s, i) => (
+          <div key={s.id} className="row-editor-row">
+            <input className="input input--icon" value={s.icon} onChange={(e) => set(i, { icon: e.target.value })} aria-label="アイコン" />
+            <input className="input row-name" value={s.name} placeholder="名前" onChange={(e) => set(i, { name: e.target.value })} />
+            <input className="input row-url" value={s.url} placeholder="https://…" onChange={(e) => set(i, { url: e.target.value })} />
+            <input type="color" className="color-input" value={s.color || '#8b7bff'} onChange={(e) => set(i, { color: e.target.value })} aria-label="色" />
+            <button type="button" className="icon-btn" aria-label="上へ" onClick={() => move(i, -1)} disabled={i === 0}>
+              <Icon name="chevronLeft" size={16} style={{ transform: 'rotate(90deg)' }} />
+            </button>
+            <button type="button" className="icon-btn" aria-label="削除" onClick={() => update((x) => void (x.shortcuts.items = x.shortcuts.items.filter((_, j) => j !== i)))}>
+              <Icon name="trash" size={18} />
+            </button>
+          </div>
+        ))}
+        <Button icon="plus" onClick={() => update((x) => void x.shortcuts.items.push({ id: newId('sc'), name: '', icon: '🔗', url: '', color: '#8b7bff' }))}>
+          ショートカットを追加
+        </Button>
+      </div>
+    </Section>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // 写真
 // ---------------------------------------------------------------------------
 
@@ -927,6 +977,7 @@ export default function SettingsSheet({ onClose }: { onClose(): void }) {
           {section === 'calendar' && <CalendarSection {...props} saved={saved} />}
           {section === 'garbage' && <GarbageSection {...props} />}
           {section === 'anniv' && <AnnivSection {...props} />}
+          {section === 'shortcuts' && <ShortcutsSection {...props} />}
           {section === 'photos' && <PhotosSection {...props} />}
           {section === 'data' && <DataSection />}
           {section === 'about' && <AboutSection />}

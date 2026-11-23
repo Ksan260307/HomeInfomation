@@ -6,6 +6,7 @@ import { KIDS_QUIZ } from '../data/kidsQuiz';
 import { TRIVIA } from '../data/trivia';
 import { TileSizeContext, makeSizeInfo } from '../components/tileKit';
 import { TILE_DEFINITIONS } from './registry';
+import { isSafeShortcutUrl } from './ShortcutTile';
 
 /** 各タイルを「いろいろなサイズ」で描画して、例外が出ない（表示が崩れて落ちない）ことを確認する */
 
@@ -92,6 +93,17 @@ describe('tiles render at every size', () => {
       }
     });
   }
+});
+
+describe('shortcut urls', () => {
+  it('allows https and app schemes but blocks dangerous ones', () => {
+    expect(isSafeShortcutUrl('https://www.nintendo.com/jp/nintendo-music/index.html')).toBe(true);
+    expect(isSafeShortcutUrl('youtube://')).toBe(true);
+    expect(isSafeShortcutUrl('javascript:alert(1)')).toBe(false);
+    expect(isSafeShortcutUrl(' JavaScript:alert(1)')).toBe(false);
+    expect(isSafeShortcutUrl('data:text/html,x')).toBe(false);
+    expect(isSafeShortcutUrl('example.com')).toBe(false);
+  });
 });
 
 describe('weather weekly view', () => {

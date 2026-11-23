@@ -11,6 +11,7 @@ import { FlyerTile } from './FlyerTile';
 import { FunFactTile } from './FunFactTile';
 import { HolidayTile } from './HolidayTile';
 import { KidsQuizTile, TriviaTile } from './QuizTiles';
+import { ShortcutTile } from './ShortcutTile';
 import type { TileComponentProps, TileDefinition } from './types';
 import { WeatherTile } from './WeatherTile';
 import { WifiTile } from './WifiTile';
@@ -287,6 +288,21 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     component: TimerTile,
     defaultProps: { presets: '1,3,5,10,15,30' },
     options: [{ key: 'presets', label: 'ボタンの時間（分・カンマ区切り）', type: 'text', placeholder: '1,3,5,10' }],
+  },
+  {
+    type: 'shortcuts',
+    name: 'ショートカット',
+    description: 'Nintendo Music やコドモンなど、アプリやサイトをワンタップで開く',
+    icon: '🔗',
+    category: 'tools',
+    defaultSize: { w: 2, h: 2 },
+    minSize: { w: 1, h: 1 },
+    component: ShortcutTile,
+    defaultProps: { labels: true, header: true },
+    options: [
+      { key: 'labels', label: '名前を表示（大きいとき）', type: 'toggle', help: 'ボタンは 設定 → ショートカット で登録します' },
+      { key: 'header', label: '見出しを表示', type: 'toggle' },
+    ],
   },
   {
     type: 'news',

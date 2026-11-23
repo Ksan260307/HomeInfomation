@@ -76,6 +76,17 @@ export interface FlyerStore {
   url: string;
 }
 
+/** ショートカットタイルのボタン（アプリやサイトを開く） */
+export interface Shortcut {
+  id: string;
+  name: string;
+  /** 表示する絵文字 */
+  icon: string;
+  /** 開くURL（https:// のほか、アプリ独自のURLスキームも可） */
+  url: string;
+  color: string;
+}
+
 export interface AppSettings {
   version: 1;
   appearance: {
@@ -134,6 +145,9 @@ export interface AppSettings {
   };
   anniversaries: {
     items: Anniversary[];
+  };
+  shortcuts: {
+    items: Shortcut[];
   };
   /** メイン画面のロック（リモコンから切り替え。編集・設定を禁止する） */
   lock: {

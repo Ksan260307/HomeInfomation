@@ -78,6 +78,13 @@ export const DEFAULT_SETTINGS: AppSettings = {
   anniversaries: {
     items: [{ id: 'xmas', name: 'クリスマス', date: '0000-12-25', kind: 'event', icon: '🎄' }],
   },
+  shortcuts: {
+    items: [
+      { id: 'nintendo-music', name: 'Nintendo Music', icon: '🎮', url: 'https://www.nintendo.com/jp/nintendo-music/index.html', color: '#e60012' },
+      { id: 'codmon', name: 'コドモン', icon: '🏫', url: 'https://parents.codmon.com/', color: '#ff9f43' },
+      { id: 'youtube', name: 'YouTube', icon: '▶️', url: 'https://www.youtube.com/', color: '#ff3b30' },
+    ],
+  },
   lock: {
     enabled: false,
   },

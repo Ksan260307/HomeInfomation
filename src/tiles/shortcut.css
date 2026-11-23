@@ -1,0 +1,50 @@
+.sc {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.sc-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.sc-btn {
+  all: unset;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--sc) 32%, transparent), color-mix(in srgb, var(--sc) 12%, transparent));
+  border: 1px solid color-mix(in srgb, var(--sc) 45%, transparent);
+  transition: transform 0.12s;
+  overflow: hidden;
+}
+
+.sc-btn:active {
+  transform: scale(0.95);
+}
+
+.sc-icon {
+  font-size: calc(var(--sc-size, 80px) * 0.36 * var(--tile-scale, 1));
+  line-height: 1.1;
+}
+
+.sc-name {
+  font-size: calc(clamp(10px, var(--sc-size, 80px) * 0.13, 18px) * var(--tile-scale, 1));
+  font-weight: 700;
+  max-width: 92%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
