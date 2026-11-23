@@ -15,6 +15,7 @@ import type {
   LayoutState,
   ListItem,
   PublicSettings,
+  RemoteCommand,
   WarningResponse,
 } from '../shared/types';
 import { TtlCache } from './lib/cache';
@@ -24,6 +25,7 @@ import { buildAreaList, parseWarnings, type AreaList } from './lib/jma';
 import { normalizeBoards, normalizeLayout } from './lib/normalize';
 import { mergeFeedItems, parseFeed } from './lib/rss';
 import { TIGERS_OFFICIAL_NEWS_URL, extractFlyers, parseTigersOfficial } from './lib/scrape';
+import { RemoteHub } from './lib/remote';
 import { JsonStore } from './lib/storage';
 import { TimeTreeClient, expandTimeTreeEvents, type TimeTreeCalendarInfo } from './lib/timetree';
 
@@ -74,6 +76,7 @@ export function createApp(opts: AppOptions) {
   const layoutStore = new JsonStore<LayoutState>(path.join(dataDir, 'layout.json'), () => structuredClone(EMPTY_LAYOUT), normalizeLayout);
   const boardsStore = new JsonStore<BoardsState>(path.join(dataDir, 'boards.json'), () => structuredClone(EMPTY_BOARDS), normalizeBoards);
   const cache = new TtlCache();
+  const remote = new RemoteHub();
   let timetree: { key: string; client: TimeTreeClient } | null = null;
 
   const getTimeTree = (s: AppSettings): TimeTreeClient | null => {
@@ -427,6 +430,37 @@ export function createApp(opts: AppOptions) {
     if (!file.startsWith(path.resolve(dir)) || !existsSync(file)) throw new HttpError(404, 'not found');
     res.setHeader('Cache-Control', 'public, max-age=86400');
     res.sendFile(file);
+  });
+
+  // ------------------------------------------------------------------ リモコン（スマホから表示端末を操作）
+  const COMMANDS = new Set(['goto', 'next', 'prev', 'reload', 'dim', 'undim', 'identify']);
+
+  api.get('/remote/stream', (req, res) => {
+    const id = req.query.id;
+    if (!RemoteHub.validId(id)) throw new HttpError(400, '端末IDが不正です');
+    res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-store', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' });
+    res.write('retry: 3000\n\n');
+    const detach = remote.attach(id, res);
+    req.on('close', detach);
+  });
+
+  api.post('/remote/heartbeat', (req, res) => {
+    const body = req.body as Record<string, unknown>;
+    if (!RemoteHub.validId(body?.id)) throw new HttpError(400, '端末IDが不正です');
+    res.json(remote.heartbeat({ ...body, id: body.id }));
+  });
+
+  api.get('/remote/displays', (_req, res) => {
+    res.json({ displays: remote.list() });
+  });
+
+  api.post('/remote/command', (req, res) => {
+    const target = String(req.body?.target ?? 'all');
+    const command = req.body?.command as RemoteCommand | undefined;
+    if (!command || !COMMANDS.has(command.type)) throw new HttpError(400, '不明な命令です');
+    if (target !== 'all' && !RemoteHub.validId(target)) throw new HttpError(400, '端末IDが不正です');
+    if (command.type === 'goto' && !(Number.isInteger(command.page) && command.page >= 0)) throw new HttpError(400, 'ページ番号が不正です');
+    res.json({ delivered: remote.send(target, command) });
   });
 
   // ------------------------------------------------------------------ エクスポート / インポート

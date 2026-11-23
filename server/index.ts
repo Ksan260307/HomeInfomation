@@ -21,6 +21,7 @@ const server = app.listen(port, host, async () => {
   console.log(`  ・データ保存先 : ${dataDir}`);
   console.log(`  ・この PC      : http://localhost:${port}`);
   for (const u of urls) console.log(`  ・iPad / スマホ: ${u}`);
+  if (urls[0]) console.log(`  ・スマホのリモコン: ${urls[0]}/remote`);
   if (!webDir) console.log('  ※ フロントエンドは未ビルドです（開発時は http://localhost:5173 を開いてください）');
   if (urls[0] && webDir) {
     console.log('\n  iPad のカメラで読み取って開けます:');

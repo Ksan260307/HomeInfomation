@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, render } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { FUN_FACTS } from '../data/funFacts';
 import { KIDS_QUIZ } from '../data/kidsQuiz';
 import { TRIVIA } from '../data/trivia';
 import { TileSizeContext, makeSizeInfo } from '../components/tileKit';
@@ -115,9 +116,10 @@ describe('weather weekly view', () => {
 });
 
 describe('quiz data', () => {
-  it('has 100 valid trivia questions', () => {
-    expect(TRIVIA).toHaveLength(100);
-    expect(new Set(TRIVIA.map((q) => q.id)).size).toBe(100);
+  it('has 400 valid trivia questions', () => {
+    expect(TRIVIA).toHaveLength(400);
+    expect(new Set(TRIVIA.map((q) => q.id)).size).toBe(400);
+    expect(new Set(TRIVIA.map((q) => q.q)).size).toBe(400);
     for (const q of TRIVIA) {
       expect(q.choices.length).toBeGreaterThanOrEqual(3);
       expect(q.answer).toBeGreaterThanOrEqual(0);
@@ -127,13 +129,22 @@ describe('quiz data', () => {
     }
   });
 
-  it('has 100 valid kids questions', () => {
-    expect(KIDS_QUIZ).toHaveLength(100);
-    expect(new Set(KIDS_QUIZ.map((q) => q.id)).size).toBe(100);
+  it('has 400 valid kids questions', () => {
+    expect(KIDS_QUIZ).toHaveLength(400);
+    expect(new Set(KIDS_QUIZ.map((q) => q.id)).size).toBe(400);
     for (const q of KIDS_QUIZ) {
       expect(q.choices.length).toBeGreaterThanOrEqual(2);
       expect(q.answer).toBeLessThan(q.choices.length);
       expect(new Set(q.choices).size).toBe(q.choices.length);
+    }
+  });
+
+  it('has 400 fun facts with answers', () => {
+    expect(FUN_FACTS).toHaveLength(400);
+    expect(new Set(FUN_FACTS.map((f) => f.q)).size).toBe(400);
+    for (const f of FUN_FACTS) {
+      expect(f.q.length).toBeGreaterThan(3);
+      expect(f.a.length).toBeGreaterThan(10);
     }
   });
 });

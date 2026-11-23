@@ -106,6 +106,10 @@ img {
   transition: opacity 2s;
 }
 
+.night-dim.is-deep {
+  opacity: 0.88;
+}
+
 .splash {
   position: fixed;
   inset: 0;

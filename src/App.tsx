@@ -1,10 +1,19 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { HomeScreen } from './components/HomeScreen';
+import { useDisplayRemote } from './hooks/useDisplayRemote';
+import { isRemoteMode } from './lib/device';
 import { useNow } from './hooks/useNow';
 import { activeProfileId, detectProfile, useApp } from './state/store';
 import { applyTheme, resolveTheme } from './themes/themes';
 
 const SettingsSheet = lazy(() => import('./components/settings/SettingsSheet'));
+const RemotePage = lazy(() => import('./components/remote/RemotePage'));
+
+/** 表示端末としてリモコンの命令を受け取る */
+function DisplayRemoteBridge({ dimmed }: { dimmed: boolean }) {
+  useDisplayRemote(dimmed);
+  return null;
+}
 
 function usePrefersDark() {
   const [dark, setDark] = useState(() => window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? true);
@@ -70,7 +79,10 @@ export default function App() {
   const prefersDark = usePrefersDark();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const now = new Date(useNow(60_000));
-  const [wake, setWake] = useState(0);
+  const remoteDim = useApp((s) => s.remoteDim);
+  const wakeUntil = useApp((s) => s.wakeUntil);
+  const setRemoteDim = useApp((s) => s.setRemoteDim);
+  const [remote] = useState(isRemoteMode);
 
   useEffect(() => {
     void init();
@@ -95,37 +107,54 @@ export default function App() {
 
   // このプロファイル用のレイアウトがまだ無ければ自動生成して保存
   useEffect(() => {
-    if (ready && !hasProfile) updateProfile((p) => p);
-  }, [ready, hasProfile, profileId, updateProfile]);
+    if (ready && !hasProfile && !remote) updateProfile((p) => p);
+  }, [ready, hasProfile, profileId, updateProfile, remote]);
 
   useEffect(() => {
     applyTheme(resolveTheme(appearance.theme, prefersDark), appearance.wallpaper);
   }, [appearance.theme, appearance.wallpaper, prefersDark]);
 
-  useWakeLock(appearance.keepAwake);
+  useWakeLock(appearance.keepAwake && !remote);
 
-  // 夜間は画面を暗くする（タップで1分間解除）
-  const night = appearance.nightDim && inNightWindow(now, appearance.nightStart, appearance.nightEnd) && Date.now() > wake && !editMode && !settingsOpen;
+  // 夜間・リモコン指示で画面を暗くする（タップで1分間解除）
+  const night = appearance.nightDim && inNightWindow(now, appearance.nightStart, appearance.nightEnd) && Date.now() > wakeUntil;
+  const dimmed = (remoteDim || night) && !editMode && !settingsOpen;
 
   if (!ready) return <div className="app splash">Home Information</div>;
 
+  const toastView = (
+    <div className="toasts" aria-live="polite">
+      {toasts.map((t) => (
+        <div key={t.id} className={`toast glass ${t.kind === 'error' ? 'is-error' : ''}`}>
+          {t.text}
+        </div>
+      ))}
+    </div>
+  );
+
+  if (remote) {
+    return (
+      <div className="app app--remote">
+        <Suspense fallback={null}>
+          <RemotePage />
+        </Suspense>
+        {toastView}
+      </div>
+    );
+  }
+
   return (
-    <div className="app" onPointerDown={night ? () => setWake(Date.now() + 60_000) : undefined}>
+    <div className="app" onPointerDown={dimmed ? () => setRemoteDim(false, 60_000) : undefined}>
+      <DisplayRemoteBridge dimmed={dimmed} />
       <HomeScreen onOpenSettings={() => setSettingsOpen(true)} />
       {!serverOnline && <div className="offline-badge">PC のサーバーに接続できません（オフライン表示中）</div>}
-      {night && <div className="night-dim" />}
+      {dimmed && <div className={`night-dim ${remoteDim ? 'is-deep' : ''}`} />}
       {settingsOpen && (
         <Suspense fallback={null}>
           <SettingsSheet onClose={() => setSettingsOpen(false)} />
         </Suspense>
       )}
-      <div className="toasts" aria-live="polite">
-        {toasts.map((t) => (
-          <div key={t.id} className={`toast glass ${t.kind === 'error' ? 'is-error' : ''}`}>
-            {t.text}
-          </div>
-        ))}
-      </div>
+      {toastView}
     </div>
   );
 }

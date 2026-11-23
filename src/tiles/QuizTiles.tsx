@@ -17,7 +17,12 @@ const LETTERS = ['A', 'B', 'C', 'D'];
 export function TriviaTile({ props }: TileComponentProps) {
   const size = useTileSize();
   const now = useNow(30_000);
-  const { index, nextChangeAt } = hourlyIndex(now, TRIVIA.length);
+  // 「次の問題」を押した回数（1時間ごとの切り替わりでリセット）
+  const hour = Math.floor(now / 3600_000);
+  const [skip, setSkip] = useState({ hour, step: 0 });
+  const step = skip.hour === hour ? skip.step : 0;
+  const { index, nextChangeAt } = hourlyIndex(now, TRIVIA.length, 0, step);
+  const nextQuestion = () => setSkip({ hour, step: step + 1 });
   const q = TRIVIA[index];
   const order = useMemo(() => seededShuffle(q.choices.map((_, i) => i), q.id * 97 + Math.floor(nextChangeAt / 3600_000)), [q, nextChangeAt]);
   const [picked, setPicked] = useState<{ id: number; choice: number } | null>(null);
@@ -42,6 +47,19 @@ export function TriviaTile({ props }: TileComponentProps) {
           </>
         )}
         <span className="trivia-hint">{revealed ? 'タップで問題にもどる' : 'タップで答え'}</span>
+        {revealed && (
+          <span
+            role="button"
+            tabIndex={0}
+            className="trivia-next-btn is-mini"
+            onClick={(e) => {
+              e.stopPropagation();
+              nextQuestion();
+            }}
+          >
+            次の問題 ▶
+          </span>
+        )}
       </button>
     );
   }
@@ -59,9 +77,14 @@ export function TriviaTile({ props }: TileComponentProps) {
             {q.choices[q.answer]}
           </div>
           <div className="trivia-explain">{q.explain}</div>
-          <button type="button" className="link-btn" onClick={() => setPicked(null)}>
-            もう一度
-          </button>
+          <span className="trivia-actions">
+            <button type="button" className="link-btn" onClick={() => setPicked(null)}>
+              もう一度
+            </button>
+            <button type="button" className="trivia-next-btn" onClick={nextQuestion}>
+              次の問題 ▶
+            </button>
+          </span>
         </div>
       ) : (
         <>
@@ -83,6 +106,17 @@ export function TriviaTile({ props }: TileComponentProps) {
             })}
           </div>
           {revealed && <div className="trivia-explain trivia-explain--full">{q.explain}</div>}
+          <div className="trivia-actions">
+            {revealed ? (
+              <button type="button" className="trivia-next-btn" onClick={nextQuestion}>
+                次の問題 ▶
+              </button>
+            ) : (
+              <button type="button" className="link-btn" onClick={nextQuestion}>
+                ほかの問題 ↻
+              </button>
+            )}
+          </div>
         </>
       )}
     </div>

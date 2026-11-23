@@ -60,6 +60,10 @@ interface AppState {
   /** 編集中で未保存の変更がある */
   dirty: boolean;
   toasts: Toast[];
+  /** リモコンから「暗くする」が指示されている */
+  remoteDim: boolean;
+  /** この時刻までは夜間減光をしない（タップ・リモコンで一時解除） */
+  wakeUntil: number;
 
   init(): Promise<void>;
   syncFromServer(): Promise<void>;
@@ -72,6 +76,7 @@ interface AppState {
   setBoards(b: BoardsState): void;
   refreshBoards(): Promise<void>;
   toast(text: string, kind?: Toast['kind']): void;
+  setRemoteDim(dim: boolean, wakeForMs?: number): void;
 }
 
 let saveTimer: number | undefined;
@@ -103,6 +108,8 @@ export const useApp = create<AppState>((set, get) => ({
   pageIndex: 0,
   dirty: false,
   toasts: [],
+  remoteDim: false,
+  wakeUntil: 0,
 
   async init() {
     await get().syncFromServer();
@@ -183,6 +190,10 @@ export const useApp = create<AppState>((set, get) => ({
     } catch {
       /* オフライン時は前回の内容を表示 */
     }
+  },
+
+  setRemoteDim(dim, wakeForMs = 0) {
+    set({ remoteDim: dim, ...(wakeForMs ? { wakeUntil: Date.now() + wakeForMs } : {}) });
   },
 
   toast(text, kind = 'info') {

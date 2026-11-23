@@ -29,7 +29,8 @@ jobs:
           NAME="home-information-${GITHUB_REF_NAME}"
           mkdir -p "release/${NAME}/scripts"
           cp -r dist package.json package-lock.json ecosystem.config.cjs README.md "release/${NAME}/"
-          cp scripts/start-windows.bat scripts/deploy-local.ps1 "release/${NAME}/scripts/"
+          cp start.bat "release/${NAME}/"
+          cp scripts/start.mjs scripts/startup.mjs scripts/register-startup.bat scripts/unregister-startup.bat scripts/start-windows.bat scripts/deploy-local.ps1 "release/${NAME}/scripts/"
           (cd release && zip -qr "${NAME}.zip" "${NAME}")
 
       - name: Publish GitHub Release

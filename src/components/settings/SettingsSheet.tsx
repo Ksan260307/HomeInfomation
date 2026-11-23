@@ -1,9 +1,11 @@
+import QRCode from 'qrcode';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { newId } from '../../../shared/defaults';
 import type { Anniversary, ExportBundle, FeedSource, FlyerStore, GarbageRule, PublicSettings } from '../../../shared/types';
 import { api } from '../../api/client';
 import { GRID_PRESETS, repairProfile } from '../../grid/layout';
 import { useRemote } from '../../hooks/useRemote';
+import { getDeviceName, setDeviceName } from '../../lib/device';
 import { WEEKDAYS } from '../../lib/utils';
 import { activeProfileId, useApp, useActiveProfile, type ProfileChoice } from '../../state/store';
 import { THEMES, WALLPAPERS, applyTheme, resolveTheme } from '../../themes/themes';
@@ -53,6 +55,7 @@ function DisplaySection({ d, update }: { d: Draft; update: Update }) {
   const profileId = useApp(activeProfileId);
   const { profile } = useActiveProfile();
 
+  const [deviceName, setName] = useState(getDeviceName);
   const setGrid = (cols: number, rows: number) =>
     updateProfile((p) => repairProfile({ ...p, cols: Math.min(12, Math.max(2, cols)), rows: Math.min(12, Math.max(2, rows)) }, limitsOf));
 
@@ -110,6 +113,19 @@ function DisplaySection({ d, update }: { d: Draft; update: Update }) {
             <input type="time" className="input input--time" value={d.appearance.nightEnd} onChange={(e) => update((x) => void (x.appearance.nightEnd = e.target.value))} />
           </div>
         </Field>
+      </Section>
+
+      <Section title="この端末の名前" desc="スマホのリモコンで端末を見分けるための名前です。この項目はすぐに反映されます。">
+        <input
+          className="input"
+          value={deviceName}
+          maxLength={40}
+          placeholder="例: リビングの iPad"
+          onChange={(e) => {
+            setName(e.target.value);
+            setDeviceName(e.target.value);
+          }}
+        />
       </Section>
 
       <Section title="この端末のレイアウト" desc="向き・端末ごとに別々のレイアウトを保存します（Android のホーム画面と同じ）。この項目はすぐに反映されます。">
@@ -663,6 +679,29 @@ function PhotosSection({ d, update }: { d: Draft; update: Update }) {
 // データ管理（エクスポート / インポート）
 // ---------------------------------------------------------------------------
 
+/** スマホのリモコン画面を開く QR コード */
+function RemoteQr({ urls }: { urls?: string[] }) {
+  const [svg, setSvg] = useState('');
+  const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+  const base = local ? urls?.[0] : location.origin;
+  const url = base ? `${base}/remote` : '';
+  useEffect(() => {
+    if (!url) return;
+    void QRCode.toString(url, { type: 'svg', margin: 1, color: { dark: '#0b0d14', light: '#ffffff' } }).then(setSvg);
+  }, [url]);
+  if (!url) return null;
+  return (
+    <div className="remote-qr">
+      <div className="remote-qr-code" dangerouslySetInnerHTML={{ __html: svg }} />
+      <div>
+        <p>スマホのカメラで読み取ると、リモコン画面が開きます。</p>
+        <p className="mono">{url}</p>
+        <p className="field-help">ページ切り替え・画面を暗くする・タスクや買い物リストの編集・各種設定ができます。</p>
+      </div>
+    </div>
+  );
+}
+
 function DataSection() {
   const [secrets, setSecrets] = useState(false);
   const [bundle, setBundle] = useState<ExportBundle | null>(null);
@@ -742,6 +781,9 @@ function DataSection() {
           </div>
         )}
         {msg && <p className="field-help">{msg}</p>}
+      </Section>
+      <Section title="スマホのリモコン">
+        <RemoteQr urls={health?.urls} />
       </Section>
       <Section title="PC サーバー">
         <dl className="info-list">

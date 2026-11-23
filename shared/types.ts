@@ -258,3 +258,29 @@ export interface WarningResponse {
   items: WarningItem[];
   fetchedAt: number;
 }
+
+// ---------------------------------------------------------------------------
+// リモコン（スマホから表示端末を操作）
+// ---------------------------------------------------------------------------
+
+export interface DisplayInfo {
+  id: string;
+  name: string;
+  profile: string;
+  page: number;
+  pageCount: number;
+  /** 各ページのタイルのアイコン（リモコンでページを見分けるため） */
+  pages: string[];
+  dim: boolean;
+  lastSeen: number;
+  connected: boolean;
+}
+
+export type RemoteCommand =
+  | { type: 'goto'; page: number }
+  | { type: 'next' }
+  | { type: 'prev' }
+  | { type: 'reload' }
+  | { type: 'dim' }
+  | { type: 'undim' }
+  | { type: 'identify' };

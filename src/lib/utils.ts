@@ -30,15 +30,21 @@ export function seededShuffle<T>(items: readonly T[], seed: number): T[] {
  * 1時間ごとに切り替わるインデックス。
  * 全件を一巡するまで同じ問題が出ないよう、周回ごとにシャッフルした順番を使う。
  */
-export function hourlyIndex(now: number, total: number, salt = 0): { index: number; nextChangeAt: number } {
-  const hour = Math.floor((now + 9 * 3600_000) / 3600_000); // 日本時間の通算時間
-  const cycle = Math.floor(hour / total);
+export function periodIndex(now: number, total: number, periodMs: number, salt = 0, step = 0): { index: number; nextChangeAt: number } {
+  const offset = 9 * 3600_000; // 日本時間の区切りに合わせる
+  const period = Math.floor((now + offset) / periodMs);
+  const slot = period + step; // step = 「次の問題」を押した回数
+  const cycle = Math.floor(slot / total);
   const order = seededShuffle(
     Array.from({ length: total }, (_, i) => i),
     cycle * 7919 + salt,
   );
-  const nextChangeAt = (hour + 1) * 3600_000 - 9 * 3600_000;
-  return { index: order[hour % total], nextChangeAt };
+  const nextChangeAt = (period + 1) * periodMs - offset;
+  return { index: order[((slot % total) + total) % total], nextChangeAt };
+}
+
+export function hourlyIndex(now: number, total: number, salt = 0, step = 0): { index: number; nextChangeAt: number } {
+  return periodIndex(now, total, 3600_000, salt, step);
 }
 
 // ---------------------------------------------------------------------------

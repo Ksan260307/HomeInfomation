@@ -1,0 +1,116 @@
+.ff {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+}
+
+.ff-count {
+  font-size: 0.78em;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ff-body {
+  all: unset;
+  box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.ff-q {
+  font-weight: 800;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ff-q--big {
+  font-size: calc(clamp(15px, min(5.4cqw, 8cqh), 30px) * var(--tile-scale, 1));
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: none;
+}
+
+.ff-a {
+  display: block;
+  padding: 0.7em 0.9em;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-left: 4px solid var(--accent);
+  line-height: 1.6;
+  color: var(--text-1);
+  overflow: hidden;
+  min-height: 0;
+  animation: pop-in 0.35s var(--ease-out);
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+}
+
+.ff-a-mark {
+  margin-right: 0.3em;
+}
+
+.ff-tap {
+  align-self: flex-start;
+  color: var(--text-3);
+  font-size: 0.85em;
+  padding: 0.3em 0.9em;
+  border-radius: 999px;
+  border: 1px dashed var(--line);
+}
+
+.ff-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex: none;
+}
+
+.ff-next {
+  all: unset;
+  cursor: pointer;
+  padding: 0.35em 1em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+  font-size: 0.88em;
+}
+
+.ff--mini {
+  all: unset;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.4em;
+  cursor: pointer;
+}
+
+.ff--mini .ff-q {
+  font-size: 0.92em;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ff--mini.is-open .ff-q {
+  font-weight: 500;
+  font-size: 0.82em;
+}
+
+.ff-hint {
+  font-size: 0.7em;
+  color: var(--text-3);
+}

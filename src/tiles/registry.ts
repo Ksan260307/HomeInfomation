@@ -8,6 +8,7 @@ import { EventsTile } from './EventsTile';
 import { AnniversaryTile, CalendarTile, GarbageTile, PhotoTile, TimerTile, WarningTile } from './ExtraTiles';
 import { NewsTile, TigersTile } from './FeedTiles';
 import { FlyerTile } from './FlyerTile';
+import { FunFactTile } from './FunFactTile';
 import { HolidayTile } from './HolidayTile';
 import { KidsQuizTile, TriviaTile } from './QuizTiles';
 import type { TileComponentProps, TileDefinition } from './types';
@@ -129,7 +130,7 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
   {
     type: 'trivia',
     name: '常識クイズ',
-    description: 'ためになる常識クイズを1時間ごとに出題（100問）',
+    description: 'ためになる常識クイズを1時間ごとに出題（400問）',
     icon: '💡',
     category: 'info',
     defaultSize: { w: 3, h: 2 },
@@ -139,9 +140,32 @@ export const TILE_DEFINITIONS: TileDefinition[] = [
     options: [{ key: 'autoReveal', label: '残り15分で自動的に答えを表示', type: 'toggle' }],
   },
   {
+    type: 'funfact',
+    name: 'トリビア',
+    description: '「へぇ〜！」となる雑学や言葉の由来（400個）',
+    icon: '🤔',
+    category: 'info',
+    defaultSize: { w: 3, h: 2 },
+    minSize: { w: 1, h: 1 },
+    component: FunFactTile,
+    defaultProps: { interval: 30, reveal: 'tap' },
+    options: [
+      { key: 'interval', label: '自動で切り替える間隔（分）', type: 'number', min: 1, max: 1440 },
+      {
+        key: 'reveal',
+        label: '答えの表示',
+        type: 'select',
+        options: [
+          { value: 'tap', label: 'タップで表示' },
+          { value: 'always', label: '最初から表示' },
+        ],
+      },
+    ],
+  },
+  {
     type: 'kidsQuiz',
     name: 'こどもクイズ',
-    description: '2〜6さい向け。えらんでタッチ！（100問）',
+    description: '2〜6さい向け。えらんでタッチ！（400問）',
     icon: '🧸',
     category: 'kids',
     defaultSize: { w: 4, h: 4 },

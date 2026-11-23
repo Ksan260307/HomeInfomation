@@ -123,6 +123,37 @@ describe('export / import', () => {
   });
 });
 
+describe('remote control', () => {
+  it('registers displays and delivers commands over SSE', async () => {
+    const id = 'd-test-1234';
+    const ctrl = new AbortController();
+    const res = await fetch(`${base}/api/remote/stream?id=${id}`, { signal: ctrl.signal });
+    expect(res.headers.get('content-type')).toContain('text/event-stream');
+    const reader = res.body!.getReader();
+    const decoder = new TextDecoder();
+
+    await call('POST', '/remote/heartbeat', { id, name: 'リビングのiPad', profile: 'tablet-landscape', page: 1, pageCount: 4, pages: ['🕐⛅', '📝', '🧸', '🛒'] });
+    const list = await call<{ displays: { id: string; name: string; connected: boolean; page: number }[] }>('GET', '/remote/displays');
+    expect(list.displays.find((d) => d.id === id)).toMatchObject({ name: 'リビングのiPad', connected: true, page: 1 });
+
+    const sent = await call<{ delivered: number }>('POST', '/remote/command', { target: id, command: { type: 'goto', page: 2 } });
+    expect(sent.delivered).toBe(1);
+
+    let text = '';
+    while (!text.includes('"goto"')) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      text += decoder.decode(value);
+    }
+    expect(text).toContain('{"type":"goto","page":2}');
+    ctrl.abort();
+  });
+
+  it('rejects unknown commands', async () => {
+    await expect(call('POST', '/remote/command', { target: 'all', command: { type: 'format-disk' } })).rejects.toThrow('400');
+  });
+});
+
 describe('photos', () => {
   it('blocks path traversal', async () => {
     const res = await fetch(`${base}/api/photos/file/..%2F..%2Fsettings.json`);
