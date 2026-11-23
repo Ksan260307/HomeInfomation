@@ -97,7 +97,7 @@ export function nextAnniversary(item: Anniversary, today: Date): AnniversaryOccu
     return toYmd(new Date(y, month - 1, Math.min(day, last)));
   };
 
-  if (item.kind === 'event' && baseYear > 0) {
+  if (item.kind === 'event' && baseYear >= 1000) {
     // 一度きりのイベント
     const daysLeft = daysBetween(todayKey, item.date);
     return daysLeft >= 0 ? { item, date: item.date, daysLeft, years: null } : null;
@@ -105,7 +105,7 @@ export function nextAnniversary(item: Anniversary, today: Date): AnniversaryOccu
   let y = today.getFullYear();
   let date = dateFor(y);
   if (date < todayKey) date = dateFor(++y);
-  return { item, date, daysLeft: daysBetween(todayKey, date), years: baseYear > 0 ? y - baseYear : null };
+  return { item, date, daysLeft: daysBetween(todayKey, date), years: baseYear >= 1000 ? y - baseYear : null };
 }
 
 export function upcomingAnniversaries(items: Anniversary[], today: Date): AnniversaryOccurrence[] {

@@ -65,6 +65,15 @@ describe('hourly quiz rotation', () => {
   });
 });
 
+describe('anniversaries (year input)', () => {
+  it('treats blank or incomplete years as yearly events without age', () => {
+    const today = new Date(2026, 10, 22);
+    expect(nextAnniversary({ id: 'a', name: 'x', date: '0000-12-25', kind: 'birthday', icon: '' }, today)).toMatchObject({ date: '2026-12-25', years: null });
+    expect(nextAnniversary({ id: 'b', name: 'x', date: '0020-12-25', kind: 'birthday', icon: '' }, today)).toMatchObject({ years: null });
+    expect(nextAnniversary({ id: 'c', name: 'x', date: '2015-04-01', kind: 'anniversary', icon: '' }, today)).toMatchObject({ date: '2027-04-01', years: 12 });
+  });
+});
+
 describe('anniversaries', () => {
   it('computes the next birthday and age', () => {
     const r = nextAnniversary({ id: 'x', name: '太郎', date: '2020-11-25', kind: 'birthday', icon: '' }, new Date(2026, 10, 22));

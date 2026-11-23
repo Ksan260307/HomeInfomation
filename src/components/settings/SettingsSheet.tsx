@@ -609,28 +609,88 @@ function GarbageSection({ d, update }: { d: Draft; update: Update }) {
 // 記念日
 // ---------------------------------------------------------------------------
 
+/**
+ * 記念日の日付入力。年は手入力（空欄なら「毎年・年不明」）、月日は選択式。
+ * カレンダーから選ぶこともできる。値は YYYY-MM-DD（年不明は 0000-MM-DD）。
+ */
+function AnnivDateInput({ value, onChange }: { value: string; onChange(v: string): void }) {
+  const picker = useRef<HTMLInputElement>(null);
+  const [ys = '0000', ms = '01', ds = '01'] = value.split('-');
+  const year = Number(ys) || 0;
+  const month = Math.min(12, Math.max(1, Number(ms) || 1));
+  const day = Math.min(31, Math.max(1, Number(ds) || 1));
+  const pad = (n: number, len = 2) => String(n).padStart(len, '0');
+  const emit = (y: number, m: number, d: number) => onChange(`${pad(y, 4)}-${pad(m)}-${pad(d)}`);
+  const invalidYear = year > 0 && (year < 1000 || year > 2999);
+
+  return (
+    <span className="anniv-date">
+      <input
+        className={`input input--year ${invalidYear ? 'is-invalid' : ''}`}
+        inputMode="numeric"
+        pattern="[0-9]*"
+        maxLength={4}
+        placeholder="年（任意）"
+        aria-label="年（空欄なら毎年）"
+        value={year > 0 ? String(year) : ''}
+        onChange={(e) => {
+          const digits = e.target.value.replace(/[^0-9０-９]/g, '').replace(/[０-９]/g, (c) => String(c.charCodeAt(0) - 0xff10)).slice(0, 4);
+          emit(digits ? Number(digits) : 0, month, day);
+        }}
+      />
+      <span className="anniv-date-sep">年</span>
+      <select className="input input--md" aria-label="月" value={month} onChange={(e) => emit(year, Number(e.target.value), day)}>
+        {Array.from({ length: 12 }, (_, i) => (
+          <option key={i + 1} value={i + 1}>
+            {i + 1}
+          </option>
+        ))}
+      </select>
+      <span className="anniv-date-sep">月</span>
+      <select className="input input--md" aria-label="日" value={day} onChange={(e) => emit(year, month, Number(e.target.value))}>
+        {Array.from({ length: 31 }, (_, i) => (
+          <option key={i + 1} value={i + 1}>
+            {i + 1}
+          </option>
+        ))}
+      </select>
+      <span className="anniv-date-sep">日</span>
+      <span className="anniv-picker">
+        <span aria-hidden="true">📅</span>
+        <input
+          ref={picker}
+          type="date"
+          aria-label="カレンダーから選ぶ"
+          value={year >= 1000 ? `${pad(year, 4)}-${pad(month)}-${pad(day)}` : ''}
+          onClick={() => {
+            try {
+              picker.current?.showPicker?.();
+            } catch {
+              /* 対応していないブラウザではそのまま */
+            }
+          }}
+          onChange={(e) => e.target.value && onChange(e.target.value)}
+        />
+      </span>
+    </span>
+  );
+}
+
 function AnnivSection({ d, update }: { d: Draft; update: Update }) {
   const set = (i: number, patch: Partial<Anniversary>) =>
     update((x) => void (x.anniversaries.items = x.anniversaries.items.map((a, j) => (j === i ? { ...a, ...patch } : a))));
   return (
-    <Section title="誕生日・記念日" desc="誕生日は生まれ年を入れると年齢も表示します。年が分からない場合は「毎年」にチェック。">
+    <Section
+      title="誕生日・記念日"
+      desc="年は手で入力できます（4桁・例: 2020）。誕生日は生まれ年を入れると年齢も表示します。年を空欄にすると、毎年くる日として表示します。📅 からカレンダーで選ぶこともできます。"
+    >
       <div className="row-editor">
         {d.anniversaries.items.map((a, i) => {
-          const unknownYear = a.date.startsWith('0000');
           return (
             <div key={a.id} className="row-editor-row">
               <input className="input input--icon" value={a.icon} onChange={(e) => set(i, { icon: e.target.value })} aria-label="アイコン" />
               <input className="input row-name" value={a.name} placeholder="名前" onChange={(e) => set(i, { name: e.target.value })} />
-              <input
-                className="input input--date"
-                type="date"
-                value={unknownYear ? `2000${a.date.slice(4)}` : a.date}
-                onChange={(e) => e.target.value && set(i, { date: unknownYear ? `0000${e.target.value.slice(4)}` : e.target.value })}
-              />
-              <label className="inline-check">
-                <input type="checkbox" checked={unknownYear} onChange={(e) => set(i, { date: e.target.checked ? `0000${a.date.slice(4)}` : `2000${a.date.slice(4)}` })} />
-                毎年
-              </label>
+              <AnnivDateInput value={a.date} onChange={(date) => set(i, { date })} />
               <select className="input input--kind" value={a.kind} onChange={(e) => set(i, { kind: e.target.value as Anniversary['kind'] })}>
                 <option value="birthday">誕生日</option>
                 <option value="anniversary">記念日</option>
