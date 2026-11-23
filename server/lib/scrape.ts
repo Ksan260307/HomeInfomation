@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import { cleanStoreName } from '../../shared/storeName';
 import type { FeedItem, FlyerItem } from '../../shared/types';
 
 // ---------------------------------------------------------------------------
@@ -46,10 +47,7 @@ export interface FlyerPage {
 export function extractFlyers(html: string, pageUrl: string): FlyerPage {
   const $ = cheerio.load(html);
   const rawTitle = $('meta[property="og:title"]').attr('content') || $('title').first().text() || '';
-  const name = rawTitle
-    .replace(/のチラシ.*$/, '')
-    .replace(/\s*[|｜].*$/, '')
-    .trim();
+  const name = cleanStoreName(rawTitle);
 
   const host = new URL(pageUrl).host;
   const flyers: FlyerItem[] = [];
@@ -57,6 +55,9 @@ export function extractFlyers(html: string, pageUrl: string): FlyerPage {
   if (host.endsWith('tokubai.co.jp')) {
     // 店舗ページの「チラシ」欄（#leaflet）にある画像だけを対象にする（近隣店舗のチラシを除外）
     const scope = $('#leaflet, .leaflet_component');
+    // チラシ欄が無いページ（チラシを出していないお店）では、ページ内の「近くのお店」のチラシを拾わないよう
+    // このお店自身のチラシページ（/チェーン名/店舗ID/leaflets/…）へのリンクが付いた画像だけを使う
+    const storePath = new URL(pageUrl).pathname.replace(/\/+$/, '').toLowerCase();
     const best = new Map<string, { kind: string; params: string; query: string; link: string }>();
     (scope.length ? scope : $('body')).find('img').each((_, img) => {
       const src = $(img).attr('data-src') || $(img).attr('src') || '';
@@ -65,6 +66,7 @@ export function extractFlyers(html: string, pageUrl: string): FlyerPage {
       const [, kind, params, id, , query = ''] = m;
       const href = $(img).closest('a').attr('href');
       const link = href ? new URL(href, pageUrl).toString() : pageUrl;
+      if (!scope.length && !new URL(link).pathname.toLowerCase().startsWith(`${storePath}/leaflets/`)) return;
       const prev = best.get(id);
       if (!prev || widthOf(params) > widthOf(prev.params)) best.set(id, { kind, params, query, link });
     });

@@ -51,6 +51,17 @@ describe('scrapers', () => {
     expect(page.flyers[0].full).toBe('https://image.tokubai.co.jp/images/bargain_office_leaflets/o=true/100.jpg?1');
     expect(page.flyers[0].link).toBe('https://tokubai.co.jp/x/1/leaflets/9');
   });
+
+  it('ignores nearby shops when a Tokubai page has no flyer section', () => {
+    const html = `<html><head><title>無印良品 天美店の新商品・クーポン | トクバイ</title></head><body>
+      <a href="/%E3%83%A9%E3%82%A4%E3%83%95/5/leaflets/1"><img src="https://image.tokubai.co.jp/images/bargain_office_leaflets/w=240,h=240,c=true/500.jpg"></a>
+      <a href="/%E7%84%A1%E5%8D%B0/7/leaflets/2"><img src="https://image.tokubai.co.jp/images/bargain_office_leaflets/w=240,h=240,c=true/600.jpg"></a>
+      </body></html>`;
+    const page = extractFlyers(html, 'https://tokubai.co.jp/%E7%84%A1%E5%8D%B0/7');
+    expect(page.name).toBe('無印良品 天美店');
+    expect(page.flyers.map((f) => f.link)).toEqual(['https://tokubai.co.jp/%E7%84%A1%E5%8D%B0/7/leaflets/2']);
+    expect(extractFlyers(html, 'https://tokubai.co.jp/%E7%84%A1%E5%8D%B0/8').flyers).toEqual([]);
+  });
 });
 
 describe('jma', () => {

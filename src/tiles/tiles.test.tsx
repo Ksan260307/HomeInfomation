@@ -1,12 +1,15 @@
 // @vitest-environment jsdom
-import { act, cleanup, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { FUN_FACTS } from '../data/funFacts';
 import { KIDS_QUIZ } from '../data/kidsQuiz';
 import { TRIVIA } from '../data/trivia';
 import { TileSizeContext, makeSizeInfo } from '../components/tileKit';
 import { TILE_DEFINITIONS } from './registry';
+import { flattenFlyers, groupFlyers } from './FlyerTile';
 import { isSafeShortcutUrl } from './ShortcutTile';
+import { cleanStoreName, shortStoreNames } from '../../shared/storeName';
+import type { FlyerResponse } from '../../shared/types';
 
 /** 各タイルを「いろいろなサイズ」で描画して、例外が出ない（表示が崩れて落ちない）ことを確認する */
 
@@ -38,7 +41,21 @@ const FIXTURES: Record<string, unknown> = {
     fetchedAt: now,
   },
   '/api/jma/warnings': { areaName: '大阪市', reportDatetime: '2026-11-21T04:17:00+09:00', headline: '乾燥', items: [{ code: '21', name: '乾燥注意報', level: 20, status: '発表' }], fetchedAt: now },
-  '/api/flyers': { stores: [{ id: 's', name: 'スーパー', url: 'https://tokubai.co.jp/x/1', flyers: [{ thumb: 'a.jpg', full: 'b.jpg', link: 'https://tokubai.co.jp' }] }], fetchedAt: now },
+  '/api/flyers': {
+    stores: [
+      { id: 's', name: 'スーパー', url: 'https://tokubai.co.jp/x/1', flyers: [{ thumb: 'a.jpg', full: 'b.jpg', link: 'https://tokubai.co.jp' }] },
+      {
+        id: 'd',
+        name: 'ドラッグストア',
+        url: 'https://tokubai.co.jp/x/2',
+        flyers: [
+          { thumb: 'c.jpg', full: 'c2.jpg', link: 'https://tokubai.co.jp' },
+          { thumb: 'd.jpg', full: 'd2.jpg', link: 'https://tokubai.co.jp' },
+        ],
+      },
+    ],
+    fetchedAt: now,
+  },
   '/api/calendar/events': { events: [{ id: 'e', title: '保育園の参観日', start: now + 3600_000, end: now + 7200_000, allDay: false, calendar: 'TimeTree' }], errors: [], fetchedAt: now },
   '/api/jma/radar': { past: [{ basetime: '20261122120000', validtime: '20261122120000' }], future: [{ basetime: '20261122120000', validtime: '20261122123000' }] },
   '/api/photos': { dir: 'C:/photos', files: [{ name: 'a.jpg', url: '/api/photos/file/a.jpg' }] },
@@ -124,6 +141,61 @@ describe('weather weekly view', () => {
       expect(days.length).toBeLessThanOrEqual(7);
       unmount();
     }
+  });
+});
+
+describe('flyer browsing', () => {
+  const data = FIXTURES['/api/flyers'] as FlyerResponse;
+
+  it('groups flyers by store in registration order', () => {
+    const all = flattenFlyers(data);
+    expect(all.map((f) => `${f.store}${f.nth + 1}/${f.count}`)).toEqual(['スーパー1/1', 'ドラッグストア1/2', 'ドラッグストア2/2']);
+    const groups = groupFlyers(all);
+    expect(groups.map((g) => [g.store, g.start, g.items.length])).toEqual([
+      ['スーパー', 0, 1],
+      ['ドラッグストア', 1, 2],
+    ]);
+    expect(flattenFlyers(data, 'd')).toHaveLength(2);
+  });
+
+  it('shortens store names for the store buttons', () => {
+    expect(cleanStoreName('ローソン 公園南矢田三丁目店の新商品・クーポン')).toBe('ローソン 公園南矢田三丁目店');
+    expect(cleanStoreName('3COINS＋plus セブンパーク天美店の商品・店舗情報')).toBe('3COINS＋plus セブンパーク天美店');
+    expect(cleanStoreName('イオン 札幌平岡店のチラシ・特売情報 | トクバイ')).toBe('イオン 札幌平岡店');
+    expect(shortStoreNames(['万代 苅田店', 'ロピア ららぽーと堺店の新商品・クーポン'])).toEqual(['万代', 'ロピア']);
+    expect(shortStoreNames(['万代 苅田店', '万代 矢田店', 'コープ'])).toEqual(['万代 苅田店', '万代 矢田店', 'コープ']);
+  });
+
+  it('narrows to one store with the store buttons and opens a grouped list', async () => {
+    const def = TILE_DEFINITIONS.find((d) => d.type === 'flyer')!;
+    const Comp = def.component;
+    const { container, getByRole, getAllByRole, unmount } = render(
+      <TileSizeContext.Provider value={makeSizeInfo(600, 400, 4, 4)}>
+        <Comp tile={{ id: 'fl', type: 'flyer', x: 0, y: 0, w: 4, h: 4 }} props={{ ...(def.defaultProps ?? {}) }} />
+      </TileSizeContext.Provider>,
+    );
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    const chips = container.querySelectorAll('.flyer-chips .chip-btn');
+    expect([...chips].map((c) => c.textContent)).toEqual(['すべて', 'スーパー1', 'ドラッグストア2']);
+
+    fireEvent.click(chips[2]);
+    const stores = [...container.querySelectorAll('.flyer-card .flyer-store')].map((e) => e.textContent);
+    expect(stores.length).toBeGreaterThan(0);
+    expect(stores.every((t) => t?.startsWith('ドラッグストア'))).toBe(true);
+    expect(chips[2].getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(getByRole('button', { name: 'チラシを一覧で見る' }));
+    const sections = document.querySelectorAll('.flyer-grid-section');
+    expect([...sections].map((s) => s.querySelector('.flyer-grid-title')?.firstChild?.textContent)).toEqual(['スーパー', 'ドラッグストア']);
+    expect(document.querySelectorAll('.flyer-grid-item')).toHaveLength(3);
+
+    // 一覧から選ぶと、そのチラシを大きく表示する
+    fireEvent.click(getAllByRole('button', { name: 'ドラッグストアのチラシ 2枚目を開く' })[0]);
+    expect(document.querySelector('.flyer-viewer-title')?.textContent).toContain('2 / 2枚目');
+    expect(document.querySelector('.flyer-viewer-scroll img')?.getAttribute('src')).toBe('d2.jpg');
+    unmount();
   });
 });
 
